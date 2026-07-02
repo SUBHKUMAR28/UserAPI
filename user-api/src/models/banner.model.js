@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const bannerSchema = new mongoose.Schema(
+const userbannerSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
     image_url: { type: String, required: true },
@@ -11,4 +11,4 @@ const bannerSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model('Banner', bannerSchema);
+module.exports = mongoose.model('UserBanner', userbannerSchema);

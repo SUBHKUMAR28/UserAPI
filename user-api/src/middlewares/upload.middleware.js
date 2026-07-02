@@ -157,42 +157,101 @@
 // const productService = require('../../services/admin/product.admin.service');
 // middlewares/ se services/ tak sirf ek "../" chahiye
 
-const productService = require('../services/admin/product.admin.service');
-const catchAsync = require('../utils/catchAsync');
-const { success } = require('../utils/apiResponse');
+// const productService = require('../services/admin/product.admin.service');
+// const catchAsync = require('../utils/catchAsync');
+// const { success } = require('../utils/apiResponse');
 
-exports.createProduct = catchAsync(async (req, res) => {
-  // req.files ek OBJECT hai (upload.fields se), Array nahi
-  const images = req.files?.images
-    ? req.files.images.map((file) => file.path)
-    : [];
+// exports.createProduct = catchAsync(async (req, res) => {
+//   // req.files ek OBJECT hai (upload.fields se), Array nahi
+//   const images = req.files?.images
+//     ? req.files.images.map((file) => file.path)
+//     : [];
 
-  const productData = {
-    ...req.body,
-    images,
-  };
+//   const productData = {
+//     ...req.body,
+//     images,
+//   };
 
-  const product = await productService.createProduct(productData);
-  return success(res, 201, 'Product created successfully', product);
+//   const product = await productService.createProduct(productData);
+//   return success(res, 201, 'Product created successfully', product);
+// });
+
+// exports.getAllProducts = catchAsync(async (req, res) => {
+//   const products = await productService.getAllProducts();
+//   return success(res, 200, 'Products fetched successfully', products);
+// });
+
+// exports.updateProduct = catchAsync(async (req, res) => {
+//   const updateData = { ...req.body };
+
+//   if (req.files?.images && req.files.images.length > 0) {
+//     updateData.images = req.files.images.map((file) => file.path);
+//   }
+
+//   const product = await productService.updateProduct(req.params.id, updateData);
+//   return success(res, 200, 'Product updated successfully', product);
+// });
+
+// exports.deleteProduct = catchAsync(async (req, res) => {
+//   await productService.deleteProduct(req.params.id);
+//   return success(res, 200, 'Product deleted successfully');
+// });
+const multer = require('multer');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('../config/cloudinary'); // apna cloudinary config file ka sahi path daalo
+
+// Storage config for profile photo
+const profileStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'profile_photos',
+    allowed_formats: ['jpg', 'jpeg', 'png'],
+  },
 });
 
-exports.getAllProducts = catchAsync(async (req, res) => {
-  const products = await productService.getAllProducts();
-  return success(res, 200, 'Products fetched successfully', products);
+// Storage config for KYC documents
+const kycStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'kyc_documents',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'pdf'],
+  },
 });
 
-exports.updateProduct = catchAsync(async (req, res) => {
-  const updateData = { ...req.body };
-
-  if (req.files?.images && req.files.images.length > 0) {
-    updateData.images = req.files.images.map((file) => file.path);
-  }
-
-  const product = await productService.updateProduct(req.params.id, updateData);
-  return success(res, 200, 'Product updated successfully', product);
+// Storage config for banner images
+const bannerStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'banners',
+    allowed_formats: ['jpg', 'jpeg', 'png'],
+  },
 });
 
-exports.deleteProduct = catchAsync(async (req, res) => {
-  await productService.deleteProduct(req.params.id);
-  return success(res, 200, 'Product deleted successfully');
+// Storage config for product images
+const productStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'products',
+    allowed_formats: ['jpg', 'jpeg', 'png'],
+  },
 });
+
+// Single file upload middleware (profile photo)
+const uploadProfile = multer({ storage: profileStorage }).single('photo');
+
+// Multiple fields upload middleware (KYC documents)
+const uploadKyc = multer({ storage: kycStorage }).fields([
+  { name: 'pan_image', maxCount: 1 },
+  { name: 'aadhaar_front_image', maxCount: 1 },
+  { name: 'aadhaar_back_image', maxCount: 1 },
+]);
+
+// Single file upload middleware (banner image)
+const uploadBanner = multer({ storage: bannerStorage }).single('image');
+
+// Multiple images upload middleware (product images)
+const uploadProduct = multer({ storage: productStorage }).fields([
+  { name: 'images', maxCount: 10 },
+]);
+
+module.exports = { uploadProfile, uploadKyc, uploadBanner, uploadProduct };

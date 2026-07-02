@@ -30,7 +30,7 @@ router.use(authMiddleware);
 
 router.post(
   '/submit',
-  ...uploadKyc,  // array spread karo
+  uploadKyc,  // array spread karo
   kycController.submitKyc
 );
 
