@@ -1,257 +1,187 @@
 
 // const multer = require('multer');
 // const { CloudinaryStorage } = require('multer-storage-cloudinary');
-// const cloudinary = require('../config/cloudinary');
+// const cloudinary = require('../config/cloudinary'); // apna cloudinary config file ka sahi path daalo
 
-// const createStorage = (folder) =>
-//   new CloudinaryStorage({
-//     cloudinary,
-//     params: { folder, allowed_formats: ['jpg', 'jpeg', 'png', 'webp'] },
-//   });
-
-// const uploadBanner = multer({ storage: createStorage('banners') });
-// const uploadKyc = multer({ storage: createStorage('kyc') });
-// const uploadProduct = multer({ storage: createStorage('products') });
-
-// module.exports = { uploadBanner, uploadKyc, uploadProduct };
-
-// const multer = require('multer');
-// const sharp = require('sharp');
-// const cloudinary = require('../config/cloudinary');
-// const { Readable } = require('stream');
-
-// // Memory storage - pehle RAM me rakhenge, compress karke Cloudinary pe bhejenge
-// const memoryStorage = multer.memoryStorage();
-
-// // Compress + Cloudinary upload helper
-// const compressAndUpload = async (buffer, folder, filename) => {
-//   let quality = 80;
-//   let finalBuffer = await sharp(buffer)
-//     .resize({ width: 1200, withoutEnlargement: true })
-//     .jpeg({ quality })
-//     .toBuffer();
-
-//   // Agar 200KB se bada hai, quality kam karte jao
-//   while (finalBuffer.length > 200 * 1024 && quality > 10) {
-//     quality -= 10;
-//     finalBuffer = await sharp(buffer)
-//       .resize({ width: 1200, withoutEnlargement: true })
-//       .jpeg({ quality })
-//       .toBuffer();
-//   }
-
-//   // Cloudinary pe stream se upload karo
-//   return new Promise((resolve, reject) => {
-//     const uploadStream = cloudinary.uploader.upload_stream(
-//       { folder, public_id: filename, resource_type: 'image' },
-//       (error, result) => {
-//         if (error) reject(error);
-//         else resolve(result);
-//       }
-//     );
-//     Readable.from(finalBuffer).pipe(uploadStream);
-//   });
-// };
-
-// // Compression middleware banane ka helper
-// const compressionMiddleware = async (req, res, next) => {
-//   try {
-//     if (!req.files && !req.file) return next();
-
-//     // Multiple files (fields) handle karo
-//     if (req.files && typeof req.files === 'object') {
-//       for (const fieldName of Object.keys(req.files)) {
-//         for (let i = 0; i < req.files[fieldName].length; i++) {
-//           const file = req.files[fieldName][i];
-//           const filename = `${Date.now()}-${i}`;
-//           const result = await compressAndUpload(
-//             file.buffer,
-//             file.cloudinaryFolder,
-//             filename
-//           );
-//           req.files[fieldName][i].path = result.secure_url;
-//         }
-//       }
-//     }
-
-//     // Single file handle karo
-//     if (req.file) {
-//       const filename = `${Date.now()}`;
-//       const result = await compressAndUpload(
-//         req.file.buffer,
-//         req.file.cloudinaryFolder,
-//         filename
-//       );
-//       req.file.path = result.secure_url;
-//     }
-
-//     next();
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
-// // Folder tag lagane ka middleware
-// const tagFolder = (folder) => (req, res, next) => {
-//   if (req.files) {
-//     Object.keys(req.files).forEach((key) => {
-//       req.files[key].forEach((file) => {
-//         file.cloudinaryFolder = folder;
-//       });
-//     });
-//   }
-//   if (req.file) req.file.cloudinaryFolder = folder;
-//   next();
-// };
-
-// // Base multer config (memory me lo)
-// const upload = multer({
-//   storage: memoryStorage,
-//   limits: { fileSize: 10 * 1024 * 1024 }, // max 10MB input
-//   fileFilter: (req, file, cb) => {
-//     if (file.mimetype.startsWith('image/')) {
-//       cb(null, true);
-//     } else {
-//       cb(new Error('Only image files allowed'), false);
-//     }
+// // Storage config for profile photo
+// const profileStorage = new CloudinaryStorage({
+//   cloudinary: cloudinary,
+//   params: {
+//     folder: 'profile_photos',
+//     allowed_formats: ['jpg', 'jpeg', 'png'],
 //   },
 // });
 
-// // -------- EXPORTS --------
-
-// // Banner upload (single image)
-// const uploadBanner = [
-//   upload.single('image'),
-//   tagFolder('lockpe/banners'),
-//   compressionMiddleware,
-// ];
-
-// // KYC documents upload (4 images)
-// const uploadKyc = [
-//   upload.fields([
-//     { name: 'pan_image', maxCount: 1 },
-//     { name: 'aadhaar_front_image', maxCount: 1 },
-//     { name: 'aadhaar_back_image', maxCount: 1 },
-//     { name: 'selfie_image', maxCount: 1 },
-//   ]),
-//   tagFolder('lockpe/kyc'),
-//   compressionMiddleware,
-// ];
-
-// // Product images upload (max 5)
-// const uploadProduct = [
-//   upload.fields([{ name: 'images', maxCount: 5 }]),
-//   tagFolder('lockpe/products'),
-//   compressionMiddleware,
-// ];
-
-// // Profile photo upload (single)
-// const uploadProfile = [
-//   upload.single('photo'),
-//   tagFolder('lockpe/profile'),
-//   compressionMiddleware,
-// ];
-
-// module.exports = { uploadBanner, uploadKyc, uploadProduct, uploadProfile };
-
-// const productService = require('../../services/admin/product.admin.service');
-// middlewares/ se services/ tak sirf ek "../" chahiye
-
-// const productService = require('../services/admin/product.admin.service');
-// const catchAsync = require('../utils/catchAsync');
-// const { success } = require('../utils/apiResponse');
-
-// exports.createProduct = catchAsync(async (req, res) => {
-//   // req.files ek OBJECT hai (upload.fields se), Array nahi
-//   const images = req.files?.images
-//     ? req.files.images.map((file) => file.path)
-//     : [];
-
-//   const productData = {
-//     ...req.body,
-//     images,
-//   };
-
-//   const product = await productService.createProduct(productData);
-//   return success(res, 201, 'Product created successfully', product);
+// // Storage config for KYC documents
+// const kycStorage = new CloudinaryStorage({
+//   cloudinary: cloudinary,
+//   params: {
+//     folder: 'kyc_documents',
+//     allowed_formats: ['jpg', 'jpeg', 'png', 'pdf'],
+//   },
 // });
 
-// exports.getAllProducts = catchAsync(async (req, res) => {
-//   const products = await productService.getAllProducts();
-//   return success(res, 200, 'Products fetched successfully', products);
+// // Storage config for banner images
+// const bannerStorage = new CloudinaryStorage({
+//   cloudinary: cloudinary,
+//   params: {
+//     folder: 'banners',
+//     allowed_formats: ['jpg', 'jpeg', 'png'],
+//   },
 // });
 
-// exports.updateProduct = catchAsync(async (req, res) => {
-//   const updateData = { ...req.body };
-
-//   if (req.files?.images && req.files.images.length > 0) {
-//     updateData.images = req.files.images.map((file) => file.path);
-//   }
-
-//   const product = await productService.updateProduct(req.params.id, updateData);
-//   return success(res, 200, 'Product updated successfully', product);
+// // Storage config for product images
+// const productStorage = new CloudinaryStorage({
+//   cloudinary: cloudinary,
+//   params: {
+//     folder: 'products',
+//     allowed_formats: ['jpg', 'jpeg', 'png'],
+//   },
 // });
 
-// exports.deleteProduct = catchAsync(async (req, res) => {
-//   await productService.deleteProduct(req.params.id);
-//   return success(res, 200, 'Product deleted successfully');
-// });
+// // Single file upload middleware (profile photo)
+// const uploadProfile = multer({ storage: profileStorage }).single('photo');
+
+// // Multiple fields upload middleware (KYC documents)
+// const uploadKyc = multer({ storage: kycStorage }).fields([
+//   { name: 'pan_image', maxCount: 1 },
+//   { name: 'aadhaar_front_image', maxCount: 1 },
+//   { name: 'aadhaar_back_image', maxCount: 1 },
+// ]);
+
+// // Single file upload middleware (banner image)
+// const uploadBanner = multer({ storage: bannerStorage }).single('image');
+
+// // Multiple images upload middleware (product images)
+// const uploadProduct = multer({ storage: productStorage }).fields([
+//   { name: 'images', maxCount: 10 },
+// ]);
+
+// module.exports = { uploadProfile, uploadKyc, uploadBanner, uploadProduct };
+
 const multer = require('multer');
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const sharp = require('sharp');
 const cloudinary = require('../config/cloudinary'); // apna cloudinary config file ka sahi path daalo
 
-// Storage config for profile photo
-const profileStorage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'profile_photos',
-    allowed_formats: ['jpg', 'jpeg', 'png'],
+// ===== Common memory storage (sab ke liye same) =====
+const memoryUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 15 * 1024 * 1024 }, // 15MB tak original allow, compress hone ke baad chhota ho jayega
+  fileFilter: (req, file, cb) => {
+    // KYC me PDF bhi allowed hai, baaki sab sirf image
+    if (file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf') {
+      return cb(null, true);
+    }
+    cb(new Error('Only image (and PDF for KYC) files are allowed'), false);
   },
 });
 
-// Storage config for KYC documents
-const kycStorage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'kyc_documents',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'pdf'],
-  },
-});
+// ===== Helper: ek buffer ko compress karke Cloudinary par upload karo =====
+const compressAndUpload = async (file, folder) => {
+  // PDF ko compress nahi karte, seedha upload karo
+  if (file.mimetype === 'application/pdf') {
+    return new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder, resource_type: 'raw' },
+        (error, result) => (error ? reject(error) : resolve(result))
+      );
+      stream.end(file.buffer);
+    });
+  }
 
-// Storage config for banner images
-const bannerStorage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'banners',
-    allowed_formats: ['jpg', 'jpeg', 'png'],
-  },
-});
+  const compressedBuffer = await sharp(file.buffer)
+    .resize({ width: 1600, withoutEnlargement: true })
+    .jpeg({ quality: 70 })
+    .toBuffer();
 
-// Storage config for product images
-const productStorage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'products',
-    allowed_formats: ['jpg', 'jpeg', 'png'],
-  },
-});
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder, resource_type: 'image' },
+      (error, result) => (error ? reject(error) : resolve(result))
+    );
+    stream.end(compressedBuffer);
+  }).then((result) => {
+    // size ko compressed buffer ke hisaab se overwrite karo
+    result.bytes = compressedBuffer.length;
+    return result;
+  });
+};
 
-// Single file upload middleware (profile photo)
-const uploadProfile = multer({ storage: profileStorage }).single('photo');
+// Result ko multer-storage-cloudinary jaisa shape do (path, filename, size)
+// taaki service files me kuch badalna na pade
+const shapeFile = (file, result) => {
+  file.path = result.secure_url;
+  file.filename = result.public_id;
+  file.size = result.bytes;
+};
 
-// Multiple fields upload middleware (KYC documents)
-const uploadKyc = multer({ storage: kycStorage }).fields([
-  { name: 'pan_image', maxCount: 1 },
-  { name: 'aadhaar_front_image', maxCount: 1 },
-  { name: 'aadhaar_back_image', maxCount: 1 },
-]);
+// ===== Profile photo (single file) =====
+const uploadProfile = (req, res, next) => {
+  memoryUpload.single('photo')(req, res, async (err) => {
+    if (err) return next(err);
+    if (!req.file) return next();
+    try {
+      const result = await compressAndUpload(req.file, 'profile_photos');
+      shapeFile(req.file, result);
+      next();
+    } catch (e) {
+      next(e);
+    }
+  });
+};
 
-// Single file upload middleware (banner image)
-const uploadBanner = multer({ storage: bannerStorage }).single('image');
+// ===== KYC documents (multiple fields) =====
+const uploadKyc = (req, res, next) => {
+  memoryUpload.fields([
+    { name: 'pan_image', maxCount: 1 },
+    { name: 'aadhaar_front_image', maxCount: 1 },
+    { name: 'aadhaar_back_image', maxCount: 1 },
+  ])(req, res, async (err) => {
+    if (err) return next(err);
+    if (!req.files) return next();
+    try {
+      for (const field of Object.keys(req.files)) {
+        const file = req.files[field][0];
+        const result = await compressAndUpload(file, 'kyc_documents');
+        shapeFile(file, result);
+      }
+      next();
+    } catch (e) {
+      next(e);
+    }
+  });
+};
 
-// Multiple images upload middleware (product images)
-const uploadProduct = multer({ storage: productStorage }).fields([
-  { name: 'images', maxCount: 10 },
-]);
+// ===== Banner image (single file) =====
+const uploadBanner = (req, res, next) => {
+  memoryUpload.single('image')(req, res, async (err) => {
+    if (err) return next(err);
+    if (!req.file) return next();
+    try {
+      const result = await compressAndUpload(req.file, 'banners');
+      shapeFile(req.file, result);
+      next();
+    } catch (e) {
+      next(e);
+    }
+  });
+};
+
+// ===== Product images (multiple files, same field) =====
+const uploadProduct = (req, res, next) => {
+  memoryUpload.fields([{ name: 'images', maxCount: 10 }])(req, res, async (err) => {
+    if (err) return next(err);
+    if (!req.files || !req.files.images) return next();
+    try {
+      for (const file of req.files.images) {
+        const result = await compressAndUpload(file, 'products');
+        shapeFile(file, result);
+      }
+      next();
+    } catch (e) {
+      next(e);
+    }
+  });
+};
 
 module.exports = { uploadProfile, uploadKyc, uploadBanner, uploadProduct };

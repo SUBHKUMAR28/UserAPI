@@ -16,7 +16,7 @@ const loanRoutes = require('./routes/loan.routes');
 const userkycRoutes = require('./routes/userkyc.routes');
 const productRoutes = require('./routes/product.routes');
 const categoryRoutes = require('./routes/category.routes');
-
+const userBannerRoutes = require('./routes/banner.routes');
 
 const errorMiddleware = require('./middlewares/error.middleware');
 const notFoundMiddleware = require('./middlewares/notFound.middleware');
@@ -68,7 +68,7 @@ app.use('/api/v1/loans', loanRoutes);
 app.use('/api/v1/kyc', userkycRoutes);
 app.use('/api/v1/products', productRoutes);
 app.use('/api/v1/categories', categoryRoutes);
-
+app.use('/api/v1/userbanners', userBannerRoutes);
 
 // ---------- 404 + Error Handler (always last) ----------
 app.use(notFoundMiddleware);

@@ -1,36 +1,4 @@
-// const mongoose = require('mongoose');
 
-// const productSchema = new mongoose.Schema(
-//   {
-//     name: { type: String, required: true, trim: true },
-//     description: { type: String, default: null },
-//     sku: { type: String, unique: true, sparse: true }, // unique product code
-
-//     category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', default: null },
-//     brand: { type: String, default: null },
-
-//     images: [{ type: String }], // Cloudinary URLs - multiple images
-
-//     price: { type: Number, required: true }, // MRP
-//     discounted_price: { type: Number, default: null }, // Sale price
-
-//     stock: { type: Number, default: 0 },
-//     sku_unit: { type: String, default: 'piece' }, // piece, kg, etc.
-
-//     specifications: { type: Map, of: String, default: {} }, // key-value pairs jaise {color: "Black", size: "M"}
-
-//     is_best_seller: { type: Boolean, default: false },
-//     is_active: { type: Boolean, default: true },
-
-//     tags: [{ type: String }], // search keywords
-
-//     rating: { type: Number, default: 0, min: 0, max: 5 },
-//     review_count: { type: Number, default: 0 },
-//   },
-//   { timestamps: true }
-// );
-
-// module.exports = mongoose.model('Product', productSchema);
 const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema(

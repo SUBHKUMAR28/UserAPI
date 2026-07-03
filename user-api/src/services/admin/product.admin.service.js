@@ -1,8 +1,27 @@
 const Product = require('../../models/product.model');
 const ApiError = require('../../utils/ApiError');
 
-exports.createProduct = async (data) => {
-  return await Product.create(data);
+// exports.createProduct = async (data) => {
+//   return await Product.create(data);
+// };
+exports.createProduct = async (data, files) => {
+  let specifications = {};
+
+  if (data.specifications) {
+    try {
+      specifications = typeof data.specifications === 'string'
+        ? JSON.parse(data.specifications)
+        : data.specifications;
+    } catch (e) {
+      specifications = {};
+    }
+  }
+
+  const product = await Product.create({
+    ...data,
+    specifications,
+  });
+  return product;
 };
 
 exports.getAllProducts = async () => {
