@@ -1,25 +1,8 @@
-// const Product = require('../models/product.model');
-// const ApiError = require('../utils/ApiError');
-
-// exports.getAllProducts = async (filters) => {
-//   const query = { is_active: true };
-
-//   if (filters.category) query.category = filters.category;
-//   if (filters.search) query.name = { $regex: filters.search, $options: 'i' };
-//   if (filters.best_seller) query.is_best_seller = true;
-
-//   return await Product.find(query).populate('category', 'name').sort({ createdAt: -1 });
-// };
-
-// exports.getProductById = async (id) => {
-//   const product = await Product.findOne({ _id: id, is_active: true }).populate('category', 'name');
-//   if (!product) throw new ApiError(404, 'Product not found');
-//   return product;
-// };
 
 const Product = require('../models/product.model');
 const Offer = require('../models/offer.model');
 const ApiError = require('../utils/ApiError');
+const sendAdminNotification = require('../utils/sendNotification');
 
 exports.getProductById = async (id) => {
   const product = await Product.findOne({ _id: id, is_active: true })
@@ -38,4 +21,20 @@ exports.getProductById = async (id) => {
   }).select('title description discount_amount valid_till');
 
   return { ...product.toObject(), offers };
+};
+
+
+exports.viewProduct = async (userId, productId) => {
+  const product = await Product.findById(productId);
+  const user = await User.findById(userId);
+
+  await sendAdminNotification({
+    userId,
+    userName: user?.full_name || 'Unknown',
+    type: 'product',
+    message: `${user?.full_name} ne "${product?.name}" product dekha`,
+    data: { product_id: productId, product_name: product?.name },
+  });
+
+  return product;
 };

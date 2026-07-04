@@ -29,9 +29,9 @@ export default function Sidebar({ open }) {
       {/* Logo */}
       <div className="flex items-center gap-3 px-5 py-5 border-b border-border-color">
         <div className="w-9 h-9 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
-          <span className="text-white font-bold text-lg">L</span>
+          <span className="text-white font-bold text-lg">P</span>
         </div>
-        {open && <span className="text-text-dark font-bold text-xl">LockPe</span>}
+        {open && <span className="text-text-dark font-bold text-xl">Pe Sarthi</span>}
       </div>
 
       {/* Nav */}
@@ -56,7 +56,7 @@ export default function Sidebar({ open }) {
       {/* Version */}
       {open && (
         <div className="px-5 py-4 border-t border-border-color">
-          <p className="text-xs text-secondary">LockPe Admin v1.0</p>
+          <p className="text-xs text-secondary">Pe Sarthiv1.0</p>
         </div>
       )}
     </aside>

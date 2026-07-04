@@ -17,8 +17,11 @@ const userkycRoutes = require('./routes/userkyc.routes');
 const productRoutes = require('./routes/product.routes');
 const categoryRoutes = require('./routes/category.routes');
 const userBannerRoutes = require('./routes/banner.routes');
+const cartRoutes = require('./routes/cart.routes');
+const orderRoutes = require('./routes/order.routes');
 
 const errorMiddleware = require('./middlewares/error.middleware');
+
 const notFoundMiddleware = require('./middlewares/notFound.middleware');
 
 const app = express();
@@ -55,7 +58,7 @@ if (process.env.NODE_ENV === 'development') {
 
 // ---------- Routes ----------
 app.get('/', (req, res) => {
-  res.json({ status: true, message: 'LockPe API is running' });
+  res.json({ status: true, message: 'Pe Sarthi API is running' });
 });
 
 app.use('/api/v1/auth', authRoutes);
@@ -69,6 +72,8 @@ app.use('/api/v1/kyc', userkycRoutes);
 app.use('/api/v1/products', productRoutes);
 app.use('/api/v1/categories', categoryRoutes);
 app.use('/api/v1/userbanners', userBannerRoutes);
+app.use('/api/v1/cart', cartRoutes);
+app.use('/api/v1/orders', orderRoutes);
 
 // ---------- 404 + Error Handler (always last) ----------
 app.use(notFoundMiddleware);
